@@ -23,6 +23,46 @@ class Connection {
         }
     }
 
+    get curve1() {
+        let mixIn = 5 * this.fromIndex;
+
+        if (this.endPos.y > this.fromPos.y) {
+            mixIn *= -1;
+        }
+
+        return {
+            x: this.fromPos.x + this.length / 2 + mixIn,
+            y: this.fromPos.y,
+        }
+    }
+
+    get curve2() {
+        let mixIn = 5 * this.toIndex;
+
+        if (this.endPos.y > this.fromPos.y) {
+            mixIn *= -1;
+        }
+
+        return {
+            x: this.endPos.x - this.length / 2 + mixIn,
+            y: this.endPos.y,
+        }
+    }
+
+    get fromIndex() {
+        return this.fromBox.connections.indexOf(this);
+    }
+
+    get toIndex() {
+        let mixIn = 0;
+
+        if (this.toBox) {
+            mixIn = this.toBox.connections.indexOf(this);
+        }
+
+        return mixIn
+    }
+
     get endPos() {
         return {
             x: this.toBox
@@ -35,21 +75,9 @@ class Connection {
     }
 
     get length() {
-        const w = this.fromBox.x - this.endPos.x
-        const h = this.fromBox.y - this.endPos.y
+        const w = this.fromPos.x - this.endPos.x
+        const h = this.fromPos.y - this.endPos.y
         return Math.sqrt(w * w + h * h)
-    }
-
-    get curvature() {
-        let mixIn = 0;
-
-        if (this.toBox) {
-            mixIn = 20 * this.toBox.connections.indexOf(this);
-        }
-        return {
-            x: this.length / 1.5 + mixIn,
-            y: this.length / 1.5 - mixIn
-        };
     }
 }
 
@@ -147,10 +175,11 @@ function draw() {
                 connection.fromPos.x,
                 connection.fromPos.y,
 
-                connection.fromPos.x + connection.curvature.x,
-                connection.fromPos.y,
-                connection.endPos.x - connection.curvature.y,
-                connection.endPos.y,
+                connection.curve1.x,
+                connection.curve1.y,
+
+                connection.curve2.x,
+                connection.curve2.y,
 
                 connection.endPos.x,
                 connection.endPos.y,
