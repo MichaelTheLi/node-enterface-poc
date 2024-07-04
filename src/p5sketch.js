@@ -1,8 +1,8 @@
-import Box from "./entity/box.js";
-import Connection from "./entity/connection.js";
+import Node from "./entity/node.js";
 
-const boxes = []
-let boxUnderMouse = null;
+import {demoWorld} from "./world.js";
+
+let nodeUnderMouse = null;
 let currentConnection = null;
 let windowCenterX;
 let windowCenterY;
@@ -14,39 +14,15 @@ const keyModifiers = {
 }
 
 export const sketch = (p) => {
+    let world = null
+
     p.setup = () => {
         p.createCanvas(1280, 640, document.querySelector('#main'));
-        // stroke(255);
-        // noFill();
 
         windowCenterX = p.width / 2.0;
         windowCenterY = p.height / 2.0;
 
-        boxes.push(new Box(
-            windowCenterX - 150,
-            windowCenterY + 75,
-            50,
-            50
-        ));
-        boxes.push(new Box(
-            windowCenterX + 150,
-            windowCenterY - 75,
-            50,
-            50
-        ));
-        const conn1 = new Connection(
-            boxes[0],
-            boxes[1]
-        )
-        boxes[0].connections.push(conn1)
-        boxes[1].connections.push(conn1)
-        const conn2 = new Connection(
-            boxes[0],
-            boxes[1]
-        )
-        boxes[0].connections.push(conn2)
-        boxes[1].connections.push(conn2)
-
+        world = demoWorld(windowCenterX, windowCenterY)
         p.rectMode(p.RADIUS);
         p.strokeWeight(2);
     }
@@ -54,11 +30,11 @@ export const sketch = (p) => {
     p.draw = () => {
         p.background(0);
 
-        boxUnderMouse = null;
-        boxes.forEach((box) => {
-            // Test if the cursor is over the box
-            if (box.isHit(p.mouseX, p.mouseY)) {
-                boxUnderMouse = box;
+        nodeUnderMouse = null;
+        world.nodes.forEach((node) => {
+            // Test if the cursor is over the node
+            if (node.isHit(p.mouseX, p.mouseY)) {
+                nodeUnderMouse = node;
 
                 p.stroke(255);
                 p.fill(244, 122, 158);
@@ -67,15 +43,15 @@ export const sketch = (p) => {
                 p.fill(244, 122, 158);
             }
 
-            p.rect(box.x, box.y, box.w, box.h);
+            p.rect(node.x, node.y, node.w, node.h);
 
             p.stroke(255);
             p.noFill();
         });
 
-        boxes.forEach((box) => {
+        world.nodes.forEach((node) => {
             // Connection drawn multiple times - by fromBox and by toBox. some set() should be utilised
-            box.connections.forEach((connection) => {
+            node.connections.forEach((connection) => {
                 p.bezier(
                     connection.fromPos.x,
                     connection.fromPos.y,
@@ -94,31 +70,31 @@ export const sketch = (p) => {
     }
 
     p.mousePressed = () => {
-        if (boxUnderMouse) {
+        if (nodeUnderMouse) {
             if (keyModifiers.alt) {
-                const iToRemove = boxes.indexOf(boxUnderMouse);
-                boxes.splice(iToRemove, 1);
-                boxUnderMouse = null;
+                const iToRemove = nodes.indexOf(nodeUnderMouse);
+                world.nodes.splice(iToRemove, 1);
+                nodeUnderMouse = null;
             } else if (keyModifiers.shift) {
                 if (!currentConnection) {
-                    currentConnection = boxUnderMouse.createFromConnection({
+                    currentConnection = nodeUnderMouse.createFromConnection({
                         x: p.mouseX,
                         y: p.mouseY
                     })
                 }
             } else {
                 if (currentConnection) {
-                    currentConnection.toBox = boxUnderMouse;
-                    boxUnderMouse.connections.push(currentConnection)
+                    currentConnection.toBox = nodeUnderMouse;
+                    nodeUnderMouse.connections.push(currentConnection)
                     currentConnection = null;
                 } else {
-                    boxUnderMouse.movingAnchor = {x: p.mouseX - boxUnderMouse.x, y: p.mouseY - boxUnderMouse.y};
+                    nodeUnderMouse.movingAnchor = {x: p.mouseX - nodeUnderMouse.x, y: p.mouseY - nodeUnderMouse.y};
                     p.fill(255, 255, 255);
                 }
             }
         } else {
             if (keyModifiers.cmd) {
-                boxes.push(new Box(
+                world.nodes.push(new Node(
                     p.mouseX,
                     p.mouseY,
                     50,
@@ -129,9 +105,9 @@ export const sketch = (p) => {
     }
 
     p.mouseDragged = () => {
-        if (boxUnderMouse && boxUnderMouse.movingAnchor) {
-            boxUnderMouse.x = p.mouseX - boxUnderMouse.movingAnchor.x;
-            boxUnderMouse.y = p.mouseY - boxUnderMouse.movingAnchor.y;
+        if (nodeUnderMouse && nodeUnderMouse.movingAnchor) {
+            nodeUnderMouse.x = p.mouseX - nodeUnderMouse.movingAnchor.x;
+            nodeUnderMouse.y = p.mouseY - nodeUnderMouse.movingAnchor.y;
         }
     }
 
@@ -175,9 +151,8 @@ export const sketch = (p) => {
     }
 
     p.mouseReleased = () => {
-        if (boxUnderMouse) {
-            boxUnderMouse.movingAnchor = null;
+        if (nodeUnderMouse) {
+            nodeUnderMouse.movingAnchor = null;
         }
     }
-
 }

@@ -1,6 +1,6 @@
 import Connection from "./connection.js";
 
-export default class Box {
+export default class Node {
     constructor(x, y, w, h) {
         this.x = x;
         this.y = y;
