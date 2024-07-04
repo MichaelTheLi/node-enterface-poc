@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "name": "signal-processing",
+  "version": "0.2.0",
+  "description": "Radio signal processing playground",
+  "private": true,
+
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "p5": "^1.7.0"
+  },
+  "devDependencies": {
+    "vite": "^5.3.1"
+  }
+}
