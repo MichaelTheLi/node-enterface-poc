@@ -1,5 +1,5 @@
 import p5 from "p5";
-
+// TODO Create another one for https://pixijs.com
 export default class P5Renderer {
     constructor() {
         // noinspection JSPotentiallyInvalidConstructorUsage
