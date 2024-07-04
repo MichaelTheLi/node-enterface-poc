@@ -1,14 +1,18 @@
 export default class Connection {
-    constructor(fromBox, toBox, tempEnd) {
-        this.fromBox = fromBox;
-        this.toBox = toBox;
+    constructor(fromNode, toNode, tempEnd) {
+        this.fromNode = fromNode;
+        this.toNode = toNode;
         this.tempEnd = tempEnd;
+    }
+
+    acceptVisitor(visitor) {
+        visitor.visitConnection(this)
     }
 
     get fromPos() {
         return {
-            x: this.fromBox.x + this.fromBox.w,
-            y: this.fromBox.y - this.fromBox.h + 10 + 10 * this.fromBox.connections.indexOf(this),
+            x: this.fromNode.x + this.fromNode.w,
+            y: this.fromNode.y - this.fromNode.h + 10 + 10 * this.fromIndex,
         }
     }
 
@@ -39,14 +43,16 @@ export default class Connection {
     }
 
     get fromIndex() {
-        return this.fromBox.connections.indexOf(this);
+        return this.fromNode
+            ? this.fromNode.node.output.indexOf(this.fromNode.node)
+            : 0;
     }
 
     get toIndex() {
         let mixIn = 0;
 
-        if (this.toBox) {
-            mixIn = this.toBox.connections.indexOf(this);
+        if (this.toNode) {
+            mixIn = this.toNode.node.input.indexOf(this.toNode.node);
         }
 
         return mixIn
@@ -54,11 +60,11 @@ export default class Connection {
 
     get endPos() {
         return {
-            x: this.toBox
-                ? this.toBox.x - this.toBox.w
+            x: this.toNode
+                ? this.toNode.x - this.toNode.w
                 : this.tempEnd.x,
-            y: this.toBox
-                ? this.toBox.y - this.toBox.h + 20 + 10 * this.toBox.connections.indexOf(this)
+            y: this.toNode
+                ? this.toNode.y - this.toNode.h + 20 + 10 * this.toIndex
                 : this.tempEnd.y,
         }
     }
