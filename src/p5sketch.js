@@ -1,20 +1,19 @@
-import Node from "./entity/node.js";
+import {demoPipelineScene} from "./pipelineScene.js";
+import {demoPipeline} from "./pipeline.js";
 
-import {demoWorld} from "./world.js";
-
-let nodeUnderMouse = null;
-let currentConnection = null;
 let windowCenterX;
 let windowCenterY;
 
-const keyModifiers = {
-    cmd: false,
-    shift: false,
-    alt: false,
-}
-
 export const sketch = (p) => {
-    let world = null
+    let pipeline = null
+    let pipelineScene = null
+    let keysMap = {
+        "Escape": "esc",
+        "Cmd": "cmd",
+        "Meta": "cmd",
+        "Shift": "shift",
+        "Alt": "alt",
+    }
 
     p.setup = () => {
         p.createCanvas(1280, 640, document.querySelector('#main'));
@@ -22,20 +21,21 @@ export const sketch = (p) => {
         windowCenterX = p.width / 2.0;
         windowCenterY = p.height / 2.0;
 
-        world = demoWorld(windowCenterX, windowCenterY)
-        p.rectMode(p.RADIUS);
-        p.strokeWeight(2);
+        pipelineScene = demoPipelineScene(demoPipeline(windowCenterX, windowCenterY))
+        pipeline = pipelineScene.pipeline
     }
 
     p.draw = () => {
+        if (pipelineScene === null) {
+            return;
+        }
+        p.rectMode(p.RADIUS);
+        p.strokeWeight(2);
         p.background(0);
 
-        nodeUnderMouse = null;
-        world.nodes.forEach((node) => {
+        pipeline.nodes.forEach((node) => {
             // Test if the cursor is over the node
-            if (node.isHit(p.mouseX, p.mouseY)) {
-                nodeUnderMouse = node;
-
+            if (node === pipelineScene.nodeUnderMouse) {
                 p.stroke(255);
                 p.fill(244, 122, 158);
             } else {
@@ -49,7 +49,7 @@ export const sketch = (p) => {
             p.noFill();
         });
 
-        world.nodes.forEach((node) => {
+        pipeline.nodes.forEach((node) => {
             // Connection drawn multiple times - by fromBox and by toBox. some set() should be utilised
             node.connections.forEach((connection) => {
                 p.bezier(
@@ -70,89 +70,26 @@ export const sketch = (p) => {
     }
 
     p.mousePressed = () => {
-        if (nodeUnderMouse) {
-            if (keyModifiers.alt) {
-                const iToRemove = nodes.indexOf(nodeUnderMouse);
-                world.nodes.splice(iToRemove, 1);
-                nodeUnderMouse = null;
-            } else if (keyModifiers.shift) {
-                if (!currentConnection) {
-                    currentConnection = nodeUnderMouse.createFromConnection({
-                        x: p.mouseX,
-                        y: p.mouseY
-                    })
-                }
-            } else {
-                if (currentConnection) {
-                    currentConnection.toBox = nodeUnderMouse;
-                    nodeUnderMouse.connections.push(currentConnection)
-                    currentConnection = null;
-                } else {
-                    nodeUnderMouse.movingAnchor = {x: p.mouseX - nodeUnderMouse.x, y: p.mouseY - nodeUnderMouse.y};
-                    p.fill(255, 255, 255);
-                }
-            }
-        } else {
-            if (keyModifiers.cmd) {
-                world.nodes.push(new Node(
-                    p.mouseX,
-                    p.mouseY,
-                    50,
-                    50
-                ));
-            }
-        }
+        pipelineScene.mousePressed(p.mouseX, p.mouseY)
     }
 
     p.mouseDragged = () => {
-        if (nodeUnderMouse && nodeUnderMouse.movingAnchor) {
-            nodeUnderMouse.x = p.mouseX - nodeUnderMouse.movingAnchor.x;
-            nodeUnderMouse.y = p.mouseY - nodeUnderMouse.movingAnchor.y;
-        }
+        pipelineScene.mouseDragged(p.mouseX, p.mouseY)
     }
 
     p.mouseMoved = () => {
-        if (currentConnection) {
-            currentConnection.tempEnd.x = p.mouseX
-            currentConnection.tempEnd.y = p.mouseY
-        }
+        pipelineScene.mouseMoved(p.mouseX, p.mouseY)
     }
 
     p.keyPressed = () => {
-        console.log(p.key)
-        // Save as is, no need to constrain the properties
-        if (p.key === 'Meta') {
-            keyModifiers.cmd = true;
-        }
-        if (p.key === 'Shift') {
-            keyModifiers.shift = true;
-        }
-        if (p.key === 'Alt') {
-            keyModifiers.alt = true;
-        }
-
-        if (p.key === 'Escape') {
-            const iToRemove = currentConnection.fromBox.connections.indexOf(currentConnection);
-            currentConnection.fromBox.connections.splice(iToRemove, 1)
-
-            currentConnection = null;
-        }
+        pipelineScene.keyPressed(keysMap[p.key] || p.key)
     }
+
     p.keyReleased = () => {
-        if (p.key === 'Meta') {
-            keyModifiers.cmd = false;
-        }
-        if (p.key === 'Shift') {
-            keyModifiers.shift = false;
-        }
-        if (p.key === 'Alt') {
-            keyModifiers.alt = false;
-        }
+        pipelineScene.keyReleased(keysMap[p.key] || p.key)
     }
 
     p.mouseReleased = () => {
-        if (nodeUnderMouse) {
-            nodeUnderMouse.movingAnchor = null;
-        }
+        pipelineScene.mouseReleased(p.mouseX, p.mouseY)
     }
 }
