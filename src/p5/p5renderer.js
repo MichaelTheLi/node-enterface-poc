@@ -96,6 +96,7 @@ export default class P5Renderer {
 
             this.p.strokeWeight(1);
             this.p.stroke(255);
+            this.p.fill(100, 100, 50);
             this.p.circle(x, y, 10);
             i += 10
         })
@@ -114,6 +115,7 @@ export default class P5Renderer {
 
             this.p.strokeWeight(1);
             this.p.stroke(255);
+            this.p.fill(100, 50, 100);
             this.p.circle(x, y, 10);
             j += 10
         })
