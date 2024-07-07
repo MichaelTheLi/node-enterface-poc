@@ -1,6 +1,5 @@
-import Connection from "./connection.js";
-
-export default class Node {
+// TODO Probe set on connection to draw signal. Time-based and frequency-based drawing
+export default class Probe {
     constructor(node, x, y, w, h) {
         this.node = node;
         this.x = x;
@@ -8,11 +7,6 @@ export default class Node {
         this.w = w;
         this.h = h;
         this.selected = false
-    }
-
-    get name() {
-        // TODO Based on node type?
-        return this.node.id
     }
 
     acceptVisitor(visitor) {

@@ -74,9 +74,20 @@ export default class P5Renderer {
 
         this.p.stroke(255);
         this.p.noFill();
+
+        this.p.strokeWeight(2);
+        this.p.stroke(50);
+        this.p.fill(255, 255, 255);
+        this.p.textSize(12);
+        this.p.textAlign(this.p.CENTER);
+        this.p.textAlign(this.p.CENTER);
+        this.p.text(node.name, node.x, node.y - node.h + 12 + 2);
     }
 
     visitConnection(connection) {
+        this.p.stroke(255);
+        this.p.noFill();
+        this.p.strokeWeight(2);
         this.p.bezier(
             connection.fromPos.x,
             connection.fromPos.y,
