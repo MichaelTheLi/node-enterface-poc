@@ -80,8 +80,43 @@ export default class P5Renderer {
         this.p.fill(255, 255, 255);
         this.p.textSize(12);
         this.p.textAlign(this.p.CENTER);
-        this.p.textAlign(this.p.CENTER);
         this.p.text(node.name, node.x, node.y - node.h + 12 + 2);
+
+        const inputs = node.node.getInputs();
+        let i = 0;
+        Object.keys(inputs).forEach((key) => {
+            this.p.strokeWeight(1);
+            this.p.stroke(50);
+            this.p.fill(255, 255, 255);
+            this.p.textSize(10);
+            this.p.textAlign(this.p.LEFT);
+            const x = node.x - node.w + 10;
+            const y = node.y - node.h + i + 10;
+            this.p.text(key, x+8, y+3);
+
+            this.p.strokeWeight(1);
+            this.p.stroke(255);
+            this.p.circle(x, y, 10);
+            i += 10
+        })
+
+        const outputs = node.node.getOutputs();
+        let j = 0;
+        Object.keys(outputs).forEach((key) => {
+            this.p.strokeWeight(1);
+            this.p.stroke(50);
+            this.p.fill(255, 255, 255);
+            this.p.textSize(10);
+            this.p.textAlign(this.p.RIGHT);
+            const x = node.x + node.w - 10;
+            const y = node.y - node.h + j + 10;
+            this.p.text(key, x-8, y+3);
+
+            this.p.strokeWeight(1);
+            this.p.stroke(255);
+            this.p.circle(x, y, 10);
+            j += 10
+        })
     }
 
     visitConnection(connection) {

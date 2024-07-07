@@ -1,17 +1,15 @@
-import Node from "./entity/node.js";
 import UINode from "./uiEntity/node.js";
 import UIConnection from "./uiEntity/connection.js";
+import Oscillator from "./entity/oscillator.js";
+import Amplifier from "./entity/amplifier.js";
 
 export function demoPipeline(pipeline) {
-    const node1 = new Node('#1')
-    const node2 = new Node('#2')
-    pipeline.addNode(node1)
-    pipeline.addNode(node2)
-    node1.output.push(node2);
-    node1.output.push(node2);
-    node2.input.push(node1)
-    node2.input.push(node1)
-    // TODO Is it ok to have both sides, input and output?
+    const oscillator = new Oscillator('#1', 'sin')
+    const amplifier = new Amplifier('#2', 3)
+    amplifier.setInput('main', oscillator.getOutput('main'))
+
+    pipeline.addNode(oscillator)
+    pipeline.addNode(amplifier)
 }
 
 export function demoPipelineScene(scene, xCenter, yCenter) {
@@ -33,7 +31,6 @@ export function demoPipelineScene(scene, xCenter, yCenter) {
     scene.elements.push(node1);
     scene.elements.push(node2);
 
-    scene.elements.push(new UIConnection(node1, node2))
-    // TODO Should be unique, now fromIndex and toIndex are messed up
-    scene.elements.push(new UIConnection(node1, node2))
+    scene.elements.push(new UIConnection(node1, 'main', node2, 'main'))
+    // scene.elements.push(new UIConnection(node1, node2))
 }

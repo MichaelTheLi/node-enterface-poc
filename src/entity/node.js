@@ -2,8 +2,26 @@
 export default class Node {
     constructor(id) {
         this.id = id;
-        this.input = [];
-        this.output = [];
+        this.inputs = {};
+        this.outputs = {};
     }
-    // TODO Base type for oscillator
+
+    getInputs() {
+        return this.inputs;
+    }
+    getOutputs() {
+        return this.outputs;
+    }
+
+    setInput(key, value) {
+        this.inputs[key] = value;
+    }
+
+    setOutput(key, value) {
+        this.outputs[key] = value
+    }
+
+    getOutput(key) {
+        return this.outputs[key].bind(this)
+    }
 }

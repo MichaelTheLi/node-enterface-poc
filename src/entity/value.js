@@ -3,9 +3,9 @@ export default class Value {
         this.rawValue = val
     }
 
-    get val() {
+    val(t) {
         if (typeof this.rawValue === 'function') {
-            return this.rawValue();
+            return this.rawValue(t);
         }
 
         return this.rawValue

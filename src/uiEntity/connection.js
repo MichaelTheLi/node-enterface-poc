@@ -1,7 +1,13 @@
 export default class Connection {
-    constructor(fromNode, toNode, tempEnd) {
+    fromPin;
+    toPin;
+    constructor(fromNode, fromPin, toNode, toPin, tempEnd) {
         this.fromNode = fromNode;
+        this.fromPin = fromPin;
+
         this.toNode = toNode;
+        this.toPin = toPin;
+
         this.tempEnd = tempEnd;
     }
 
@@ -43,8 +49,9 @@ export default class Connection {
     }
 
     get fromIndex() {
+        const outputs = Object.keys(this.fromNode.node.getOutputs())
         return this.fromNode
-            ? this.fromNode.node.output.indexOf(this.fromNode.node)
+            ? outputs.indexOf(this.fromPin)
             : 0;
     }
 
@@ -52,7 +59,8 @@ export default class Connection {
         let mixIn = 0;
 
         if (this.toNode) {
-            mixIn = this.toNode.node.input.indexOf(this.toNode.node);
+            const inputs = Object.keys(this.toNode.node.getInputs())
+            mixIn = inputs.indexOf(this.toPin);
         }
 
         return mixIn
